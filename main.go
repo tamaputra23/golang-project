@@ -13,14 +13,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-// Article - Our struct for all articles
-type Article struct {
-	Id      string `json:"Id"`
-	Title   string `json:"Title"`
-	Desc    string `json:"desc"`
-	Content string `json:"content"`
-}
-
 type inl_s3_gdrive_mirror_log struct {
 	id        int
 	file_id   string
@@ -28,7 +20,6 @@ type inl_s3_gdrive_mirror_log struct {
 	owners    string
 }
 
-var Articles []Article
 var db *gorm.DB
 var err error
 
@@ -68,17 +59,13 @@ func UpdatePayment(w http.ResponseWriter, r *http.Request) {
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/getData", getData)
-	myRouter.HandleFunc("/article", UpdatePayment).Methods("PATCH")
-	myRouter.HandleFunc("/article/{id}", deleteData).Methods("DELETE")
+	myRouter.HandleFunc("/getdata", getData)
+	myRouter.HandleFunc("/updatedata/{id}", UpdatePayment).Methods("PATCH")
+	myRouter.HandleFunc("/deletedata/{id}", deleteData).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
 func main() {
-	Articles = []Article{
-		Article{Id: "1", Title: "Hello", Desc: "Article Description", Content: "Article Content"},
-		Article{Id: "2", Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
-	}
 
 	db, err = gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=postgres sslmode=disable password=postgres")
 	if err != nil {
